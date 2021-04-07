@@ -1,4 +1,4 @@
-module dumpDetector
+module github.com/knexguy101/DumpDetector
 
 go 1.16
 
