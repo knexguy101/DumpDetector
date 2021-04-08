@@ -1,24 +1,35 @@
-# DumpPlug
+# DumpDetector
 
 Uses Windows pathing to detect if new .DMP files are being created using the Task Manager
 
 ## Installation
 
 ```bash
-go get -u github.com/knexguy101/dumpPlug
+go get -u github.com/knexguy101/DumpDetector
 ```
 
 ## Usage
 
 ```go
 
-import "github.com/knexguy101/dumpPlug"
+package main
 
-//errorThreshold - the amount of errors the detector can take before exiting (0 for unlimited)
-//panicOnExit - panics if detected or threshold is met
-//onDet - callback before panic (if panicOnExit = true) when new dump is found
-//onThresh - callback before panic (if panicOnExit = true) when error threshold is met
-dumpDetector.DetectDumps(5, true, func(){}, func(){})
+import (
+	"github.com/knexguy101/DumpDetector"
+)
+
+func main(){
+	done := make(chan bool)
+	watcher, _ := dumpDetector.MonitorDumps(&dumpDetector.MonitorOptions{
+		Write: true,
+		Create: true,
+		Remove: false,
+		MaxErrors: 10, //set to 0 for no limit
+	})
+	defer watcher.Close()
+	<-done
+}
+
 
 ```
 
