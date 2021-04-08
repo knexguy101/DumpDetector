@@ -1,16 +1,6 @@
-package github
-
-import (
-	"github.com/fsnotify/fsnotify"
-	"log"
-	"os"
-	"path"
-)
-
 package dumpDetector
 
 import (
-	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"log"
 	"os"
