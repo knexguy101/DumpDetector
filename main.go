@@ -13,11 +13,13 @@ type MonitorOptions struct {
 	Remove bool
 	MaxErrors int
 	OtherPaths []string
+	OnDetectedFile func()
+	OnErrorCountExceeded func()
 }
 
-func checkPanic(err error, max int, curr int) {
-	if max > 0 && curr >= max {
-		panic(err)
+func checkPanic(options *MonitorOptions, err error, curr int) {
+	if options.MaxErrors > 0 && curr >= options.MaxErrors {
+		options.OnErrorCountExceeded()
 	}
 }
 
@@ -33,32 +35,35 @@ func MonitorDumps(options *MonitorOptions) (*fsnotify.Watcher, error) {
 			select {
 			case event, ok := <-watcher.Events:
 				if !ok {
-					checkPanic(err, options.MaxErrors, errCount)
+					checkPanic(options, err, errCount)
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write && options.Write {
 					if path.Ext(event.Name) != ".DMP" {
 						continue
 					}
 					_ = os.RemoveAll(event.Name)
+					options.OnDetectedFile()
 					panic("new .dmp being written to")
 				} else if event.Op&fsnotify.Create == fsnotify.Create && options.Create {
 					if path.Ext(event.Name) != ".DMP" {
 						continue
 					}
 					_ = os.RemoveAll(event.Name)
+					options.OnDetectedFile()
 					panic("new .dmp being created")
 				} else if event.Op&fsnotify.Remove == fsnotify.Remove && options.Remove {
 					if path.Ext(event.Name) != ".DMP" {
 						continue
 					}
 					_ = os.RemoveAll(event.Name)
+					options.OnDetectedFile()
 					panic("new .dmp being removed")
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
-					checkPanic(err, options.MaxErrors, errCount)
+					checkPanic(options, err, errCount)
 				}
-				checkPanic(err, options.MaxErrors, errCount)
+				checkPanic(options, err, errCount)
 			}
 		}
 	}()
