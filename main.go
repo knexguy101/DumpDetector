@@ -1,3 +1,12 @@
+package github
+
+import (
+	"github.com/fsnotify/fsnotify"
+	"log"
+	"os"
+	"path"
+)
+
 package dumpDetector
 
 import (
@@ -16,7 +25,7 @@ type MonitorOptions struct {
 	OtherPaths []string
 }
 
-func CheckPanic(err error, max int, curr int) {
+func checkPanic(err error, max int, curr int) {
 	if max > 0 && curr >= max {
 		panic(err)
 	}
@@ -30,14 +39,12 @@ func MonitorDumps(options *MonitorOptions) (*fsnotify.Watcher, error) {
 
 	go func() {
 		errCount := 0
-		fmt.Println("Monitored Started")
 		for {
 			select {
 			case event, ok := <-watcher.Events:
 				if !ok {
-					CheckPanic(err, options.MaxErrors, errCount)
+					checkPanic(err, options.MaxErrors, errCount)
 				}
-				log.Println("event:", event)
 				if event.Op&fsnotify.Write == fsnotify.Write && options.Write {
 					if path.Ext(event.Name) != ".DMP" {
 						continue
@@ -59,9 +66,9 @@ func MonitorDumps(options *MonitorOptions) (*fsnotify.Watcher, error) {
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
-					CheckPanic(err, options.MaxErrors, errCount)
+					checkPanic(err, options.MaxErrors, errCount)
 				}
-				CheckPanic(err, options.MaxErrors, errCount)
+				checkPanic(err, options.MaxErrors, errCount)
 			}
 		}
 	}()
