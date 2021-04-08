@@ -43,21 +43,18 @@ func MonitorDumps(options *MonitorOptions) (*fsnotify.Watcher, error) {
 					}
 					_ = os.RemoveAll(event.Name)
 					options.OnDetectedFile()
-					panic("new .dmp being written to")
 				} else if event.Op&fsnotify.Create == fsnotify.Create && options.Create {
 					if path.Ext(event.Name) != ".DMP" {
 						continue
 					}
 					_ = os.RemoveAll(event.Name)
 					options.OnDetectedFile()
-					panic("new .dmp being created")
 				} else if event.Op&fsnotify.Remove == fsnotify.Remove && options.Remove {
 					if path.Ext(event.Name) != ".DMP" {
 						continue
 					}
 					_ = os.RemoveAll(event.Name)
 					options.OnDetectedFile()
-					panic("new .dmp being removed")
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
