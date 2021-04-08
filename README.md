@@ -26,6 +26,10 @@ func main(){
 		Create: true,
 		Remove: false,
 		MaxErrors: 10,
+		OtherPaths: []string {
+			"add/new/paths/here",
+			"we/monitor/them/all",
+		},
 		OnDetectedFile: func(){
 			//panic will stop the file
 			panic(errors.New("detected file"))
