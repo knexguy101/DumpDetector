@@ -1,4 +1,4 @@
-# DumpPlug
+# DumpDetector
 
 Uses Windows pathing to detect if new .DMP files are being created using the Task Manager
 
@@ -21,7 +21,10 @@ import (
 func main(){
 	done := make(chan bool)
 	watcher, _ := dumpDetector.MonitorDumps(&dumpDetector.MonitorOptions{
-		
+		Write: true,
+		Create: true,
+		Remove: false,
+		MaxErrors: 10, //set to 0 for no limit
 	})
 	defer watcher.Close()
 	<-done
