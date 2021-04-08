@@ -15,6 +15,7 @@ go get -u github.com/knexguy101/DumpDetector
 package main
 
 import (
+	"errors"
 	"github.com/knexguy101/DumpDetector"
 )
 
@@ -24,7 +25,15 @@ func main(){
 		Write: true,
 		Create: true,
 		Remove: false,
-		MaxErrors: 10, //set to 0 for no limit
+		MaxErrors: 10,
+		OnDetectedFile: func(){
+			//panic will stop the file
+			panic(errors.New("detected file"))
+		},
+		OnErrorCountExceeded: func(){
+			//panic will stop the program
+			panic(errors.New("error count exceeded"))
+		},
 	})
 	defer watcher.Close()
 	<-done
